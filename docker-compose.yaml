@@ -1,0 +1,53 @@
+services:
+  # -------------------------
+  # Base de Datos PostgreSQL
+  # -------------------------
+  db:
+    image: postgres:16
+    container_name: jose_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=invejose
+      - POSTGRES_USER=jose
+      - POSTGRES_PASSWORD=jose
+      - TZ=America/Bogota
+    volumes:
+      - ./data/db-data:/var/lib/postgresql/data
+
+  # -------------------------
+  # pgAdmin (interfaz web)
+  # -------------------------
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - db
+    ports:
+      - "55506:80"
+    volumes:
+      - ./pgadmin/config/config_local.py:/pgadmin4/config_local.py
+    environment:
+      PGADMIN_DEFAULT_EMAIL: example@example.com
+      PGADMIN_DEFAULT_PASSWORD: Lf123-.-
+    restart: unless-stopped
+
+  # -------------------------
+  # PostgREST (API REST)
+  # -------------------------
+  postgrest:
+    image: postgrest/postgrest:latest
+    container_name: jose_postgrest
+    depends_on:
+      - db
+    ports:
+      - "55507:3000"
+    environment:
+      PGRST_DB_URI: postgres://jose:jose@db:5432/invejose
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: web_anon
+      PGRST_SERVER_PORT: 3000
+    restart: unless-stopped
+
+networks:
+  default:
+    name: jose_net
+

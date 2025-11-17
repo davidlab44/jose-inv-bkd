@@ -1,0 +1,28 @@
+curl -X POST http://localhost:55507/registros_json \
+  -H "Content-Type: application/json" \
+  -d '{
+    "datos": {
+      "nombre": "Juan Pérez",
+      "edad": 30,
+      "direccion": "Calle 45 #12-34",
+      "compras": ["monitor", "teclado"]
+    }
+  }'
+
+
+
+
+
+
+curl http://localhost:55507/registros_json
+[{"id":1,"creado_en":"2025-11-03T21:25:46.609459-05:00","datos":{"edad": 30, "nombre": "Juan Pérez", "compras": ["monitor", "teclado"], "direccion": "Calle 45 #12-34"}}]root@master:/var/ws/jse/inv/bkd# 
+
+curl http://localhost:55507/product
+
+
+patch
+curl -X PATCH "http://localhost:55507/product?id=eq.5" \
+  -H "Content-Type: application/json" \
+  -d '{"datos": {"qty": 20}}'
+
+

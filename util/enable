@@ -1,0 +1,65 @@
+Crear la tabla inicial con campo JSONB
+
+Una vez que levantes el contenedor (docker compose up -d), entra al contenedor PostgreSQL:
+
+docker exec -it jose_db psql -U jose -d invejose
+
+
+Luego crea el rol anónimo (que PostgREST necesita) y la tabla:
+
+-- Rol anónimo para PostgREST
+create role web_anon nologin;
+
+-- Permitir acceso a la tabla desde el rol anónimo
+grant usage on schema public to web_anon;
+
+-- Crear tabla para objetos JSON
+create table registros_json (
+  id serial primary key,
+  creado_en timestamptz default now(),
+  datos jsonb not null
+);
+
+-- Permitir al rol web_anon leer la tabla
+grant select, insert, update, delete on registros_json to web_anon;
+
+
+GRANT USAGE, SELECT ON SEQUENCE registros_json_id_seq TO web_anon;
+GRANT UPDATE ON SEQUENCE registros_json_id_seq TO web_anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.product TO web_anon;
+
+
+
+docker restart jose_postgrest
+
+
+curl http://localhost:55507/product
+
+
+
+
+--------------------
+
+Verifica que la tabla exista realmente:
+
+docker exec -it jose_db psql -U jose -d invejose -c "\dt"
+
+
+Debe mostrar algo así:
+
+        List of relations
+ Schema |       Name       | Type  | Owner 
+--------+------------------+-------+-------
+ public | registros_json   | table | jose
+------------------------
+
+
+
+
+
+
+
+
+
+
+
